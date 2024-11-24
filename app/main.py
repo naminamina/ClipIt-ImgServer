@@ -13,8 +13,8 @@ def generate_id():
 
 
 @app.get("/")
-async def read_root():
-    return {"message": "Hello, Clipit-ImgServer!"}
+async def root():
+    return {"message": "Hello World"}
 
 
 @app.post("/upload")
