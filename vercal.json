@@ -11,14 +11,14 @@
       ],
     "functions": {
       "app/main.py": {
-        "maxDuration": 60
+        "maxDuration": 120
       }
     },
     "routes": [
-        {
-          "src": "/(.*)",
-          "dest": "/app/main.py"
-        }
-      ]
+      {
+        "src": "/(.*)",
+        "dest": "/app.main:app"
+      }
+    ]
 }
 
