@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image</title>
+    <script>
+        async function handleFormSubmit(event) {
+            event.preventDefault(); // フォーム送信を防止
+
+            const formData = new FormData(event.target);
+            const response = await fetch("http://127.0.0.1:8000/upload", {  <!-- スラッシュを追加 -->
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert("Image uploaded successfully!");
+            } else {
+                alert("Image upload failed.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Upload an image</h1>
+    <form id="uploadForm" onsubmit="handleFormSubmit(event)" enctype="multipart/form-data">
+        <label for="file">Choose an image:</label>
+        <input type="file" id="file" name="file" accept="image/*">
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>
