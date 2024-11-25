@@ -9,26 +9,45 @@
             event.preventDefault(); // フォーム送信を防止
 
             const formData = new FormData(event.target);
-            const response = await fetch("http://127.0.0.1:8000/upload", {  <!-- スラッシュを追加 -->
-                method: "POST",
-                body: formData
-            });
 
-            const result = await response.json();
-            if (result.success) {
-                alert("Image uploaded successfully!");
-            } else {
-                alert("Image upload failed.");
+            try {
+                const response = await fetch("http://127.0.0.1:8000/upload", { // エンドポイントURL
+                    method: "POST",
+                    body: formData
+                });
+
+                // レスポンスを JSON として解析
+                const result = await response.json();
+
+                // レスポンスを表示
+                const resultDiv = document.getElementById("result");
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <p><strong>Similarity:</strong> ${result.similarity.toFixed(2)}%</p>
+                        <p><strong>Rank:</strong> ${result.rank}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${result.detail || "An unknown error occurred."}</p>`;
+                }
+            } catch (error) {
+                console.error("Request failed:", error);
+                const resultDiv = document.getElementById("result");
+                resultDiv.innerHTML = `<p style="color: red;">Error: Unable to reach the server.</p>`;
             }
         }
     </script>
 </head>
 <body>
-    <h1>Upload an image</h1>
+    <h1>Upload an Image</h1>
     <form id="uploadForm" onsubmit="handleFormSubmit(event)" enctype="multipart/form-data">
         <label for="file">Choose an image:</label>
-        <input type="file" id="file" name="file" accept="image/*">
+        <input type="file" id="file" name="file" accept="image/*" required>
         <button type="submit">Upload</button>
     </form>
+
+    <!-- 結果を表示するエリア -->
+    <div id="result" style="margin-top: 20px;">
+        <!-- ここに結果が挿入されます -->
+    </div>
 </body>
 </html>
