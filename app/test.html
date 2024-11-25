@@ -11,7 +11,7 @@
             const formData = new FormData(event.target);
 
             try {
-                const response = await fetch("http://127.0.0.1:8000/upload", { // エンドポイントURL
+                const response = await fetch("https://clipit-imgserver.onrender.com/upload", { // エンドポイントURL
                     method: "POST",
                     body: formData
                 });

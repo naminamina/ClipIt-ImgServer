@@ -2,8 +2,19 @@ from fastapi import FastAPI, File, UploadFile
 import time
 import os
 import shutil 
-
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,              # 許可するオリジン
+    allow_credentials=True,             # Cookieを許可する場合はTrue
+    allow_methods=["*"],                # 許可するHTTPメソッド
+    allow_headers=["*"],                # 許可するHTTPヘッダー
+)
+
+
+
 IMG_DIR = "./upload_img"
 os.makedirs(IMG_DIR, exist_ok=True) 
 
