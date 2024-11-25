@@ -7,12 +7,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,              # 許可するオリジン
-    allow_credentials=True,             # Cookieを許可する場合はTrue
-    allow_methods=["*"],                # 許可するHTTPメソッド
-    allow_headers=["*"],                # 許可するHTTPヘッダー
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
 
 
 IMG_DIR = "./upload_img"
