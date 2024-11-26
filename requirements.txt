@@ -1,7 +1,8 @@
 fastapi
 uvicorn
 pillow
-requests
-transformers
-torch
 python-multipart
+requests
+sqlalchemy
+torch
+transformers
