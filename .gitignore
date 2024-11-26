@@ -5,4 +5,5 @@ venv/
 /app/test.html
 /upload_img/*
 !upload_img/123456789.jpg
-
+/main.py
+/test.html
