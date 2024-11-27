@@ -1,6 +1,7 @@
 import os
 import time
 import shutil 
+import logging  
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -41,7 +42,7 @@ def root():
 @app.post("/upload", response_model=uploadResponse)
 def response_similarity(file: UploadFile = File(...), theme: str = Form(...)):
     try:
-        print(f"file:{file.filename}, theme: {theme}")  
+        logging(f"file:{file.filename}, theme: {theme}")  
         img_id = generate_id()
         file_name = img_id + ".jpeg"
         file_path = os.path.join(IMG_DIR, file_name)
@@ -64,7 +65,7 @@ def response_similarity(file: UploadFile = File(...), theme: str = Form(...)):
 
         cosine_similarity = F.cosine_similarity(image_embeds, text_embeds)
         similarity_percentage = cosine_similarity.item() * 100
-        print(f"cosine_similarity:{similarity_percentage}")  
+        logging(f"cosine_similarity:{similarity_percentage}")  
         return uploadResponse(similarity=similarity_percentage,img_id = img_id)
     except Exception as e:
         raise HTTPException("error " + e)
