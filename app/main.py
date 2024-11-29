@@ -9,6 +9,8 @@ from pydantic import BaseModel
 import torch.nn.functional as F
 from transformers import CLIPProcessor, CLIPModel
 from PIL import Image
+import requests
+from io import BytesIO
 
 MODEL = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 PROCESSOR = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
@@ -32,7 +34,6 @@ def generate_id():
 
 class uploadResponse(BaseModel):
     similarity: float
-    img_id: int
 
 @app.get("/")
 def root():
@@ -42,19 +43,19 @@ def root():
 @app.post("/upload", response_model=uploadResponse)
 
 def response_similarity(theme: str = Form(...), img_url: str = Form(...)):
-    try:
-        logging.info(f"images:{img_url}, theme: {theme}")  
 
-        inputs = PROCESSOR(text=[theme], images=[img_url], return_tensors="pt", padding=True)
+    logging.info(f"images:{img_url}, theme: {theme}")  
+    img_data = requests.get(img_url)
+    img_data = Image.open(BytesIO(img_data.content))
+    inputs = PROCESSOR(text=[theme], images=[img_data], return_tensors="pt", padding=True)
 
-        outputs = MODEL(**inputs)
-        image_embeds = outputs.image_embeds
-        text_embeds = outputs.text_embeds
+    outputs = MODEL(**inputs)
+    image_embeds = outputs.image_embeds
+    text_embeds = outputs.text_embeds
 
-        cosine_similarity = F.cosine_similarity(image_embeds, text_embeds)
-        similarity_percentage = cosine_similarity.item() * 100
-        logging.info(f"cosine_similarity:{similarity_percentage}")  
-        return uploadResponse(similarity=similarity_percentage,img_id = img_id)
-    except Exception as e:
-        raise HTTPException("error " + e)
+    cosine_similarity = F.cosine_similarity(image_embeds, text_embeds)
+    similarity_percentage = cosine_similarity.item() * 100
+    logging.info(f"cosine_similarity:{similarity_percentage}")  
+    return uploadResponse(similarity=similarity_percentage)
+
 
