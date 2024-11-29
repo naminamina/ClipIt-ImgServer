@@ -40,24 +40,12 @@ def root():
 
 
 @app.post("/upload", response_model=uploadResponse)
-def response_similarity(file: UploadFile = File(...), theme: str = Form(...)):
+
+def response_similarity(theme: str = Form(...), img_url: str = Form(...)):
     try:
-        logging.info(f"file:{file.filename}, theme: {theme}")  
-        img_id = generate_id()
-        file_name = img_id + ".jpeg"
-        file_path = os.path.join(IMG_DIR, file_name)
+        logging.info(f"images:{img_url}, theme: {theme}")  
 
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-
-        try:
-            image = Image.open(file_path)
-        except Exception as e:
-            raise HTTPException(status_code=400, detail="Invalid image file")
-
-
-
-        inputs = PROCESSOR(text=[theme], images=image, return_tensors="pt", padding=True)
+        inputs = PROCESSOR(text=[theme], images=[img_url], return_tensors="pt", padding=True)
 
         outputs = MODEL(**inputs)
         image_embeds = outputs.image_embeds
@@ -69,3 +57,4 @@ def response_similarity(file: UploadFile = File(...), theme: str = Form(...)):
         return uploadResponse(similarity=similarity_percentage,img_id = img_id)
     except Exception as e:
         raise HTTPException("error " + e)
+
