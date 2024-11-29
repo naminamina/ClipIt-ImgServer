@@ -7,5 +7,5 @@ venv/
 !upload_img/123456789.jpg
 /main.py
 /test.html
-/test.bash
+/test.sh
 /start_local.sh
