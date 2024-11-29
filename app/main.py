@@ -21,8 +21,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  
     allow_credentials=True,
-    allow_methods=["*"],  
-    allow_headers=["*"],  
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # def clip_analysis(theme, img_url):
@@ -48,7 +48,7 @@ def clip_analysis(theme, img_url):
         img_data = Image.open(BytesIO(img_data.content))
         # inputs = PROCESSOR(text=[theme], images=[img_data], return_tensors="pt", padding=True)
 
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cpu"
         tokenizer = AutoTokenizer.from_pretrained(HF_MODEL_PATH, trust_remote_code=True)
         processor = AutoImageProcessor.from_pretrained(HF_MODEL_PATH, trust_remote_code=True)
         model = AutoModel.from_pretrained(HF_MODEL_PATH, trust_remote_code=True).to(device)
