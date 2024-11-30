@@ -5,3 +5,4 @@ requests
 torch
 transformers
 python-multipart
+sentencepiece
