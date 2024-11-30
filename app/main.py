@@ -6,17 +6,10 @@ from fastapi import FastAPI, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import torch
-import torch.nn.functional as F
-from transformers import AutoImageProcessor, AutoModel, AutoTokenizer,AutoProcessor,CLIPModel,CLIPProcessor
+from transformers import AutoProcessor
 from PIL import Image
 
-# os.environ["TF_CACHE"] = "/tmp"
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-
-# HF_MODEL_PATH = 'line-corporation/clip-japanese-base'
-# MODEL = CLIPModel.from_pretrained("google/siglip-base-patch16-224")
-# PROCESSOR = CLIPProcessor.from_pretrained("google/siglip-base-patch16-224")
 
 MODEL = AutoModel.from_pretrained("google/siglip-base-patch16-256-multilingual")
 PROCESSOR = AutoProcessor.from_pretrained("google/siglip-base-patch16-256-multilingual")
@@ -34,11 +27,7 @@ def clip_analysis(theme, img_url):
     try:
         img_request_data = requests.get(img_url)
         img_open_data = Image.open(BytesIO(img_request_data.content))
-        # inputs = PROCESSOR(text=[theme], images=[img_open_data], return_tensors="pt", padding=True)
 
-        # outputs = MODEL(**inputs)
-        # image_embeds = outputs.image_embeds
-        # text_embeds = outputs.text_embeds
         texts = [theme]
 
         inputs = PROCESSOR(text=texts, images=img_open_data, padding="max_length", return_tensors="pt")
@@ -51,46 +40,8 @@ def clip_analysis(theme, img_url):
         return percentage_similarity
     except Exception  as e:
         logging.info(F"Clip error:{e}")
+        raise HTTPException(status_code=500, detail="Clip error.")
 
-
-# def clip_analysis(theme, img_url):
-#     try:
-#         img_request_data = requests.get(img_url)
-#         img_open_data = Image.open(BytesIO(img_request_data.content))
-#         inputs = PROCESSOR(text=[theme], images=[img_open_data], return_tensors="pt", padding=True)
-#         outputs = MODEL(**inputs)
-#         image_embeds = outputs.image_embeds
-#         text_embeds = outputs.text_embeds
-#         logits_per_image = outputs.logits_per_image
-#         probs = torch.sigmoid(logits_per_image) 
-   
-#         return probs[0][0]*100
-#     except Exception  as e:
-#         logging.info(F"Clip error:{e}")
-
-
-
-# def clip_analysis(theme, img_url):
-#     try:
-#         img_data = requests.get(img_url)
-#         img_data = Image.open(BytesIO(img_data.content))
-#         # inputs = PROCESSOR(text=[theme], images=[img_data], return_tensors="pt", padding=True)
-
-#         device = "cpu"
-#         tokenizer = AutoTokenizer.from_pretrained(HF_MODEL_PATH, trust_remote_code=True)
-#         processor = AutoImageProcessor.from_pretrained(HF_MODEL_PATH, trust_remote_code=True)
-#         model = AutoModel.from_pretrained(HF_MODEL_PATH, trust_remote_code=True).to(device)
-
-#         image = processor(img_data, return_tensors="pt").to(device)
-#         text = tokenizer([theme]).to(device)
-#         image_features = model.get_image_features(**image)
-#         text_features = model.get_text_features(**text)
-#         cosine_similarity = F.cosine_similarity(image_features, text_features)
-#         percentage_similarity = round(cosine_similarity.item() * 100, 2)
-
-#         return percentage_similarity
-#     except Exception  as e:
-#         logging.info(F"Clip error:{e}")
 
 class uploadResponse(BaseModel):
     similarity: float
@@ -105,13 +56,17 @@ def root():
 
 def response_similarity(theme: str = Form(...), img_url: str = Form(...)):
     try:
-
+        if not theme or not img_url:
+            raise HTTPException(status_code=400, detail="request error. thmemeとimg_urlが必要です")
         logging.info(f"theme: {theme}, images:{img_url}")  
         return_similarity = clip_analysis(theme, img_url)
         logging.info(f"cosine_similarity:{return_similarity}")  
         return uploadResponse(similarity=return_similarity)
 
+    except ValidationError as e:
+        logging.info(F"Validation error:{e}")
+        raise HTTPException(status_code=422, detail=f"Validation error: {str(e)}")
 
     except Exception  as e:
         logging.info(F"Server error:{e}")
-        raise e
+        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
