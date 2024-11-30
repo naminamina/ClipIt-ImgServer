@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from transformers import AutoImageProcessor, AutoModel, AutoTokenizer,AutoProcessor
 from PIL import Image
 
-os.environ["TF_CACHE"] = "/tmp"
+# os.environ["TF_CACHE"] = "/tmp"
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # MODEL = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
