@@ -96,14 +96,13 @@ class RequestModel(BaseModel):
 def root():
     return {"message": "Clip-imgServer"}
 
+@app.post("/upload", response_model=uploadResponse)
 
-@app.post("/upload")
-
-def response_similarity(request: RequestModel):
+def response_similarity(theme: str = Form(...), img_url: str = Form(...)):
     try:
 
-        logging.info(f"theme: {request.theme}, images:{request.img_url}")  
-        return_similarity = clip_analysis(request.theme, request.img_url)
+        logging.info(f"theme: {theme}, images:{img_url}")  
+        return_similarity = clip_analysis(theme, img_url)
         logging.info(f"cosine_similarity:{return_similarity}")  
         return uploadResponse(similarity=return_similarity)
 
