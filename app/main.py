@@ -43,7 +43,7 @@ def clip_analysis(theme, img_url):
 
         cosine_similarity = F.cosine_similarity(image_embeds, text_embeds)
         percentage_similarity = round(cosine_similarity.item() * 100, 2)
-        return cosine_similarity
+        return percentage_similarity
     except Exception  as e:
         logging.info(F"Clip error:{e}")
 
