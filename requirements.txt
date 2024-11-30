@@ -6,3 +6,5 @@ torch
 transformers
 python-multipart
 sentencepiece
+protobuf
+gradio
